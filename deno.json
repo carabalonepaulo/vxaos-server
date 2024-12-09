@@ -7,5 +7,9 @@
     "lib/": "./lib/",
     "packets/": "./packets/",
     "@std/assert": "jsr:@std/assert@1"
-  }
+  },
+  "compilerOptions": {
+    "lib": ["deno.ns", "deno.unstable", "deno.worker"]
+  },
+  "unstable": ["worker-options"]
 }

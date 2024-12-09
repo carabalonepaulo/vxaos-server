@@ -1,5 +1,5 @@
 import { PlaceHolder } from "services/placeholder.ts";
-import { Database } from "services/database.ts";
+import { Database } from "services/database/service.ts";
 import { Listener } from "services/listener.ts";
 import { PacketHandler } from "services/packet_handler.ts";
 

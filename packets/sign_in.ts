@@ -1,7 +1,7 @@
 import { Reader, Writer } from "lib/buffer.ts";
 import { Services } from "lib/service.ts";
 import { Packet, PacketId } from "packets/mod.ts";
-import { Database } from "services/database.ts";
+import { Database } from "services/database/service.ts";
 
 export class SignIn implements Packet {
   id = PacketId.Login;
