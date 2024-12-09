@@ -2,6 +2,8 @@ import { QueryParameterSet } from "https://deno.land/x/sqlite@v3.9.1/mod.ts";
 import { Service, Services } from "lib/service.ts";
 import { Message, Result } from "services/database/meta.ts";
 
+const maxTasks = 2048;
+
 type Task = (arg: Result) => void;
 
 export class Database implements Service {
@@ -9,7 +11,7 @@ export class Database implements Service {
   private tasks: (Task | null)[];
 
   constructor() {
-    this.tasks = Array.from<Task | null>({ length: 2048 }).fill(null);
+    this.tasks = Array.from<Task | null>({ length: maxTasks }).fill(null);
   }
 
   start(_services: Services, _shutdown: () => void): void {
@@ -29,68 +31,62 @@ export class Database implements Service {
     this.worker.terminate();
   }
 
+  private post(
+    action: string,
+    sql: string,
+    params: QueryParameterSet | undefined,
+    resolve: (result: Result) => void,
+    reject: () => void,
+  ) {
+    const id = this.tasks.indexOf(null);
+    if (id === -1) {
+      reject();
+      return;
+    }
+
+    this.worker.postMessage({
+      action: action,
+      id,
+      sql,
+      params: params === undefined ? [] : params,
+    } as Message);
+    this.tasks[id] = (result) => {
+      this.tasks[id] = null;
+      resolve(result);
+    };
+  }
+
+  async scalar<T>(
+    sql: string,
+    params?: QueryParameterSet,
+  ): Promise<T | undefined> {
+    const row = await this.first<[T]>(sql, params);
+    return row === undefined ? undefined : row[0] as T;
+  }
+
   async exec(sql: string, params?: QueryParameterSet): Promise<void> {
     return await new Promise((resolve, reject) => {
-      const id = this.tasks.indexOf(null);
-      if (id === -1) {
-        reject();
-        return;
-      }
-
-      this.worker.postMessage({
-        action: "exec",
-        id,
-        sql,
-        params: params === undefined ? [] : params,
-      } as Message);
-      this.tasks[id] = (_) => {
-        this.tasks[id] = null;
-        resolve();
-      };
+      this.post("exec", sql, params, (_) => resolve(), reject);
     });
   }
 
-  async all<T>(sql: string, params?: QueryParameterSet): Promise<T[]> {
+  async all<T>(
+    sql: string,
+    params?: QueryParameterSet,
+  ): Promise<T[] | undefined> {
     return (await new Promise((resolve, reject) => {
-      const id = this.tasks.indexOf(null);
-      if (id === -1) {
-        reject();
-        return;
-      }
-
-      const message: Message = {
-        action: "all",
-        id,
-        sql,
-        params: params === undefined ? [] : params,
-      };
-      this.worker.postMessage(message);
-      this.tasks[id] = (e: Result) => {
-        this.tasks[id] = null;
-        resolve(e.rows!);
-      };
+      this.post("all", sql, params, (result) => resolve(result.rows), reject);
     }) as unknown) as T[];
   }
 
-  async first<T>(sql: string, params?: QueryParameterSet): Promise<T> {
+  async first<T>(
+    sql: string,
+    params?: QueryParameterSet,
+  ): Promise<T | undefined> {
     return (await new Promise((resolve, reject) => {
-      const id = this.tasks.indexOf(null);
-      if (id === -1) {
-        reject();
-        return;
-      }
-
-      const message: Message = {
-        action: "first",
-        id,
-        sql,
-        params: params === undefined ? [] : params,
-      };
-      this.worker.postMessage(message);
-      this.tasks[id] = (e: Result) => {
-        this.tasks[id] = null;
-        resolve(e.rows!.length === 1 ? e.rows![0] : undefined);
-      };
+      this.post("first", sql, params, (result) => {
+        resolve(result.rows === undefined ? undefined : result.rows[0]);
+      }, reject);
     }) as unknown) as T;
   }
 }

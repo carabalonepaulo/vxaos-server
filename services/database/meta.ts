@@ -20,6 +20,8 @@ export interface Result {
 }
 
 export interface Database {
-  query(sql: string, params?: QueryParameterSet): Promise<Row[]>;
+  scalar<T>(sql: string, params?: QueryParameterSet): Promise<T | undefined>;
+  first<T>(sql: string, params?: QueryParameterSet): Promise<T | undefined>;
+  query<T>(sql: string, params?: QueryParameterSet): Promise<T[] | undefined>;
   exec(sql: string, params?: QueryParameterSet): Promise<void>;
 }
