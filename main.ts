@@ -3,7 +3,7 @@ import { Database } from "services/database.ts";
 import { Listener } from "services/listener.ts";
 import { PacketHandler } from "services/packet_handler.ts";
 
-import { run } from "src/service.ts";
+import { run } from "lib/service.ts";
 
 run(
   new PlaceHolder(),

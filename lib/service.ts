@@ -13,21 +13,33 @@ export class Services {
 }
 
 export interface Service {
-  start(services: Services, shutdown: () => void): void;
-  stop(): void;
+  depends?: string[];
+  start?(services: Services, shutdown: () => void): void;
+  stop?(): void;
 }
 
 export function run(...services: Service[]) {
   const servicesHelper = new Services(services);
+  const names = services.map((s) => s.constructor.name);
 
   const shutdown = () =>
     services.reverse().forEach((s) => {
-      s.stop();
+      if (s.stop !== undefined) s.stop();
       console.log(`Service ${s.constructor.name} stopped!`);
     });
 
+  for (const s of services) {
+    if (s.depends === undefined) continue;
+    for (const dep of s.depends) {
+      if (names.indexOf(dep) !== -1) continue;
+      throw new Error(
+        `Service '${s.constructor.name}' missing dependency '${dep}'.`,
+      );
+    }
+  }
+
   services.forEach((s) => {
-    s.start(servicesHelper, shutdown);
+    if (s.start !== undefined) s.start(servicesHelper, shutdown);
     console.log(`Service ${s.constructor.name} started!`);
   });
 

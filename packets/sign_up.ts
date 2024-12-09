@@ -1,8 +1,8 @@
-import { Reader, Writer } from "../buffer.ts";
-import { Packet } from "../packet.ts";
-import { Services } from "../service.ts";
+import { Reader, Writer } from "lib/buffer.ts";
+import { Services } from "lib/service.ts";
+import { Packet } from "packets/mod.ts";
 
-export class SignIn implements Packet {
+export class SignUp implements Packet {
   email!: string;
   password!: string;
 
