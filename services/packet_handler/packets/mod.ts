@@ -1,6 +1,6 @@
-import { Reader, Writer } from "lib/buffer.ts";
-import { SignIn } from "packets/sign_in.ts";
-import { Services } from "lib/service.ts";
+import { Reader, Writer } from "services/listener/buffer.ts";
+import { SignIn } from "services/packet_handler/packets/sign_in.ts";
+import { Services } from "services/mod.ts";
 
 export interface Packet {
   serialize(writer: Writer): void;
@@ -8,8 +8,8 @@ export interface Packet {
   handle(services: Services, id: number): void;
 }
 
-export * from "packets/sign_in.ts";
-export * from "packets/sign_up.ts";
+export * from "services/packet_handler/packets/sign_in.ts";
+export * from "services/packet_handler/packets/sign_up.ts";
 
 export enum PacketId {
   None,

@@ -1,7 +1,7 @@
-import { Listener } from "services/listener.ts";
-import { Reader } from "lib/buffer.ts";
-import { Packets } from "packets/mod.ts";
-import { Service, Services } from "lib/service.ts";
+import { Listener } from "services/listener/service.ts";
+import { Reader } from "services/listener/buffer.ts";
+import { Packets } from "services/packet_handler/packets/mod.ts";
+import { Service, Services } from "services/mod.ts";
 
 export class PacketHandler implements Service {
   depends = ["Database", "Listener"];

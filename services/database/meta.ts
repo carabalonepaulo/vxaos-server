@@ -25,3 +25,8 @@ export interface Database {
   query<T>(sql: string, params?: QueryParameterSet): Promise<T[] | undefined>;
   exec(sql: string, params?: QueryParameterSet): Promise<void>;
 }
+
+interface State {
+  id: number;
+  name: string;
+}

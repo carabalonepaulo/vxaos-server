@@ -1,4 +1,4 @@
-import { Service, Services } from "lib/service.ts";
+import { Service, Services } from "services/mod.ts";
 
 interface Client {
   id: number;

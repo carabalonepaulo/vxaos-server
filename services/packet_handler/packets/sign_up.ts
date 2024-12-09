@@ -1,6 +1,6 @@
-import { Reader, Writer } from "lib/buffer.ts";
-import { Services } from "lib/service.ts";
-import { Packet } from "packets/mod.ts";
+import { Reader, Writer } from "services/listener/buffer.ts";
+import { Services } from "services/mod.ts";
+import { Packet } from "services/packet_handler/packets/mod.ts";
 
 export class SignUp implements Packet {
   email!: string;

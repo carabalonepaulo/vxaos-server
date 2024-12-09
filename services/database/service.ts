@@ -1,5 +1,5 @@
 import { QueryParameterSet } from "https://deno.land/x/sqlite@v3.9.1/mod.ts";
-import { Service, Services } from "lib/service.ts";
+import { Service, Services } from "services/mod.ts";
 import { Message, Result } from "services/database/meta.ts";
 
 const maxTasks = 2048;
